@@ -277,12 +277,22 @@ void chargeMode() {
   delay(500);
   tft->fillScreen(BGCOLOR);
   unsigned long tmp=0;
+  int initialBatteryLevel = getBattery(); // Get initial battery level
   while(!check(SelPress)) {
     if(millis()-tmp>5000) {
-      displayRedStripe(String(getBattery()) + " %");
+      int currentBatteryLevel = getBattery(); // Get current battery level
+      displayRedStripe(String(currentBatteryLevel) + " %");
       tmp=millis();
+      // Check if battery level is increasing (indicating charging)
+      if (currentBatteryLevel > initialBatteryLevel) {
+        digitalWrite(PIN_RGB_LED, HIGH); // Turn LED on
+      } else {
+        digitalWrite(PIN_RGB_LED, LOW);  // Turn LED off
+      }
+      initialBatteryLevel = currentBatteryLevel; // Update initial level
     }
   }
+  digitalWrite(PIN_RGB_LED, LOW); // Ensure LED is off when exiting charge mode
   setCpuFrequencyMhz(240);
   setBrightness(bright,false);
 }
